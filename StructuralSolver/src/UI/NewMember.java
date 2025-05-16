@@ -21,8 +21,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import crossSections.SquareSection;
 import main.UnitConvertion;
-import partObjects.SquareSection;
 
 /**
  * JFrame that alows the user to create a new member through a list of diferent
