@@ -1,12 +1,46 @@
 package main;
 
-import UI.NewMember;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+import UI.MainWindow;
+import drawingObjects.DrawingObjects;
 
 public class MAIN {
 
+	public static MainWindow masterWindow;
+
 	public static void main(String[] args) {
 
-		new NewMember();
+		masterWindow = new MainWindow();
+
+	}
+
+	public static void print() {
+
+		JPanel panel = new JPanel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			protected void paintComponent(Graphics g) {
+
+				super.paintComponent(g);
+
+				for (int i = 0; i < DrawingObjects.Lines.size(); i++) {
+					g.drawLine((int) DrawingObjects.Lines.get(i).Points[0].x,
+							(int) DrawingObjects.Lines.get(i).Points[0].y,
+							(int) DrawingObjects.Lines.get(i).Points[1].x,
+							(int) DrawingObjects.Lines.get(i).Points[1].y);
+				}
+
+			}
+		};
+
+		masterWindow.UpadateDrawingPanel(panel);
+
 	}
 
 }
