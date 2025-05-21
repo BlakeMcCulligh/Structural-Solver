@@ -21,7 +21,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import crossSections.AngleSection;
+import crossSections.CSection;
+import crossSections.CircleSection;
+import crossSections.HollowCircleSection;
+import crossSections.HollowRectSection;
+import crossSections.ISection;
+import crossSections.RectSection;
 import crossSections.SquareSection;
+import crossSections.TSection;
 import main.UnitConvertion;
 
 /**
@@ -31,8 +39,8 @@ import main.UnitConvertion;
  * @author blake M.
  * 
  * @version 1.0 
- * May 16, 2025
- * -Solid Square Cross-section added
+ * May 20, 2025 
+ * -Solid Square, Rect, and Circle; Hollow Rect, and Circle; Angle, I, C, and  t Cross-sections added
  * 
  */
 public class NewMember extends JFrame {
@@ -65,12 +73,41 @@ public class NewMember extends JFrame {
 		JPanel createSquareSectionPanel = createSquareSection();
 		CrossSectionTabs.addTab("Solid Square", createSquareSectionPanel);
 
-		// JPanel drawingPanel2 = createDrawingPanel("Content for Tab 2");
-		// drawingTabs.addTab("Tab 2", drawingPanel2);
+		// Solid Rectangle Tab
+		JPanel createRectSectionPanel = createRectSection();
+		CrossSectionTabs.addTab("Solid Rectangle", createRectSectionPanel);
+
+		// Solid Circle Tab
+		JPanel createCirlceSectionPanel = createCircleSection();
+		CrossSectionTabs.addTab("Solid Circle", createCirlceSectionPanel);
+
+		// Hollow Rectangle Tab
+		JPanel createHollowRectSectionPanel = createHollowRectSection();
+		CrossSectionTabs.addTab("Hollow Rectangle", createHollowRectSectionPanel);
+
+		// Hollow Circle Tab
+		JPanel createHollowCircleSectionPanel = createHollowCircleSection();
+		CrossSectionTabs.addTab("Hollow Cirlce", createHollowCircleSectionPanel);
+
+		// Angle Tab
+		JPanel createAngleSectionPanel = createAngleSection();
+		CrossSectionTabs.addTab("Angle", createAngleSectionPanel);
+
+		// I-Section Tab
+		JPanel createISectionPanel = createISection();
+		CrossSectionTabs.addTab("I-Section", createISectionPanel);
+
+		// C-Section Tab
+		JPanel createCSectionPanel = createCSection();
+		CrossSectionTabs.addTab("C-Section", createCSectionPanel);
+
+		// T-Section Tab
+		JPanel createTSectionPanel = createTSection();
+		CrossSectionTabs.addTab("T-Secton", createTSectionPanel);
 
 		add(CrossSectionTabs);
 
-		this.setSize(600, 500);
+		this.setSize(825, 500);
 		setLocationRelativeTo(null);
 
 		setVisible(true);
@@ -286,7 +323,670 @@ public class NewMember extends JFrame {
 
 		int material = materialDecoder(MValue);
 
+		dispose();
+		
 		new SquareSection(d, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the Angle tab
+	 * 
+	 * @return JPanel for the Angle tab
+	 */
+	private JPanel createAngleSection() {
+
+		JPanel AngleSectionPanel = new JPanel();
+
+		AngleSectionPanel.setLayout(new BoxLayout(AngleSectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		AngleSectionPanel.add(diameterPanal);
+
+		JPanel WidthPanal = DoubleTextBox("b:", true);
+		AngleSectionPanel.add(WidthPanal);
+
+		JPanel ThicknessPanal = DoubleTextBox("t:", true);
+		AngleSectionPanel.add(ThicknessPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		AngleSectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		AngleSectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		AngleSectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(e -> AngleSectionCreated(diameterPanal, WidthPanal, ThicknessPanal, LengthPanal,
+				EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		AngleSectionPanel.add(CreatePanal);
+
+		return AngleSectionPanel;
+	}
+
+	/**
+	 * When a angle section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing width
+	 * @param dPanel JPanel storing thickness
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void AngleSectionCreated(JPanel dPanel, JPanel bPanel, JPanel tPanel, JPanel LPanel, JPanel KPanel,
+			JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField bValue = (JTextField) bPanel.getComponent(1);
+		JComboBox<String> bUnit = (JComboBox<String>) bPanel.getComponent(2);
+
+		JTextField tValue = (JTextField) tPanel.getComponent(1);
+		JComboBox<String> tUnit = (JComboBox<String>) tPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double b = UnitConvertion.linearTomm(Double.parseDouble(bValue.getText()), bUnit.getSelectedItem().toString());
+		double t = UnitConvertion.linearTomm(Double.parseDouble(tValue.getText()), tUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new AngleSection(d, b, t, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the Solid circle tab
+	 * 
+	 * @return JPanel for the Solid circle tab
+	 */
+	private JPanel createCircleSection() {
+
+		JPanel CircleSectionPanel = new JPanel();
+
+		CircleSectionPanel.setLayout(new BoxLayout(CircleSectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		CircleSectionPanel.add(diameterPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		CircleSectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		CircleSectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		CircleSectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(
+				e -> CircleSectionCreated(diameterPanal, LengthPanal, EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		CircleSectionPanel.add(CreatePanal);
+
+		return CircleSectionPanel;
+	}
+
+	/**
+	 * When a circle section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void CircleSectionCreated(JPanel dPanel, JPanel LPanel, JPanel KPanel, JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new CircleSection(d, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the C-section tab
+	 * 
+	 * @return JPanel for the C-section tab
+	 */
+	private JPanel createCSection() {
+
+		JPanel CSectionPanel = new JPanel();
+
+		CSectionPanel.setLayout(new BoxLayout(CSectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		CSectionPanel.add(diameterPanal);
+
+		JPanel WidthPanal = DoubleTextBox("b:", true);
+		CSectionPanel.add(WidthPanal);
+
+		JPanel ThicknessPanal = DoubleTextBox("t:", true);
+		CSectionPanel.add(ThicknessPanal);
+
+		JPanel wPanal = DoubleTextBox("W:", true);
+		CSectionPanel.add(wPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		CSectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		CSectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		CSectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(e -> CSectionCreated(diameterPanal, WidthPanal, ThicknessPanal, wPanal,
+				LengthPanal, EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		CSectionPanel.add(CreatePanal);
+
+		return CSectionPanel;
+	}
+
+	/**
+	 * When a C section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing width
+	 * @param dPanel JPanel storing thickness
+	 * @param dPanel JPanel storing w
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void CSectionCreated(JPanel dPanel, JPanel bPanel, JPanel tPanel, JPanel wPanel, JPanel LPanel,
+			JPanel KPanel, JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField bValue = (JTextField) bPanel.getComponent(1);
+		JComboBox<String> bUnit = (JComboBox<String>) bPanel.getComponent(2);
+
+		JTextField tValue = (JTextField) tPanel.getComponent(1);
+		JComboBox<String> tUnit = (JComboBox<String>) tPanel.getComponent(2);
+
+		JTextField wValue = (JTextField) wPanel.getComponent(1);
+		JComboBox<String> wUnit = (JComboBox<String>) wPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double b = UnitConvertion.linearTomm(Double.parseDouble(bValue.getText()), bUnit.getSelectedItem().toString());
+		double t = UnitConvertion.linearTomm(Double.parseDouble(tValue.getText()), tUnit.getSelectedItem().toString());
+		double w = UnitConvertion.linearTomm(Double.parseDouble(wValue.getText()), wUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new CSection(d, b, t, w, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the Hollow Circle tab
+	 * 
+	 * @return JPanel for the Hollow Circle tab
+	 */
+	private JPanel createHollowCircleSection() {
+
+		JPanel HollowCircleSectionPanel = new JPanel();
+
+		HollowCircleSectionPanel.setLayout(new BoxLayout(HollowCircleSectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		HollowCircleSectionPanel.add(diameterPanal);
+
+		JPanel ThicknessPanal = DoubleTextBox("t:", true);
+		HollowCircleSectionPanel.add(ThicknessPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		HollowCircleSectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		HollowCircleSectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		HollowCircleSectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(e -> HollowCircleSectionCreated(diameterPanal, ThicknessPanal, LengthPanal,
+				EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		HollowCircleSectionPanel.add(CreatePanal);
+
+		return HollowCircleSectionPanel;
+	}
+
+	/**
+	 * When a Hollow Circle section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing thickness
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void HollowCircleSectionCreated(JPanel dPanel, JPanel tPanel, JPanel LPanel, JPanel KPanel, JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField tValue = (JTextField) tPanel.getComponent(1);
+		JComboBox<String> tUnit = (JComboBox<String>) tPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double t = UnitConvertion.linearTomm(Double.parseDouble(tValue.getText()), tUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new HollowCircleSection(d, t, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the Hollow-Rectangle tab
+	 * 
+	 * @return JPanel for the Hollow Rectangle tab
+	 */
+	private JPanel createHollowRectSection() {
+
+		JPanel CSectionPanel = new JPanel();
+
+		CSectionPanel.setLayout(new BoxLayout(CSectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		CSectionPanel.add(diameterPanal);
+
+		JPanel WidthPanal = DoubleTextBox("b:", true);
+		CSectionPanel.add(WidthPanal);
+
+		JPanel ThicknessPanal = DoubleTextBox("t:", true);
+		CSectionPanel.add(ThicknessPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		CSectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		CSectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		CSectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(e -> HollowRectSectionCreated(diameterPanal, WidthPanal, ThicknessPanal,
+				LengthPanal, EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		CSectionPanel.add(CreatePanal);
+
+		return CSectionPanel;
+	}
+
+	/**
+	 * When a Hollow Rect section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing width
+	 * @param dPanel JPanel storing thickness
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void HollowRectSectionCreated(JPanel dPanel, JPanel bPanel, JPanel tPanel, JPanel LPanel, JPanel KPanel,
+			JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField bValue = (JTextField) bPanel.getComponent(1);
+		JComboBox<String> bUnit = (JComboBox<String>) bPanel.getComponent(2);
+
+		JTextField tValue = (JTextField) tPanel.getComponent(1);
+		JComboBox<String> tUnit = (JComboBox<String>) tPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double b = UnitConvertion.linearTomm(Double.parseDouble(bValue.getText()), bUnit.getSelectedItem().toString());
+		double t = UnitConvertion.linearTomm(Double.parseDouble(tValue.getText()), tUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new HollowRectSection(d, b, d - 2 * t, b - 2 * t, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the I-section tab
+	 * 
+	 * @return JPanel for the I-section tab
+	 */
+	private JPanel createISection() {
+
+		JPanel ISectionPanel = new JPanel();
+
+		ISectionPanel.setLayout(new BoxLayout(ISectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		ISectionPanel.add(diameterPanal);
+
+		JPanel WidthPanal = DoubleTextBox("b:", true);
+		ISectionPanel.add(WidthPanal);
+
+		JPanel ThicknessPanal = DoubleTextBox("t:", true);
+		ISectionPanel.add(ThicknessPanal);
+
+		JPanel wPanal = DoubleTextBox("W:", true);
+		ISectionPanel.add(wPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		ISectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		ISectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		ISectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(e -> ISectionCreated(diameterPanal, WidthPanal, ThicknessPanal, wPanal,
+				LengthPanal, EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		ISectionPanel.add(CreatePanal);
+
+		return ISectionPanel;
+	}
+
+	/**
+	 * When a I section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing width
+	 * @param dPanel JPanel storing thickness
+	 * @param dPanel JPanel storing w
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void ISectionCreated(JPanel dPanel, JPanel bPanel, JPanel tPanel, JPanel wPanel, JPanel LPanel,
+			JPanel KPanel, JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField bValue = (JTextField) bPanel.getComponent(1);
+		JComboBox<String> bUnit = (JComboBox<String>) bPanel.getComponent(2);
+
+		JTextField tValue = (JTextField) tPanel.getComponent(1);
+		JComboBox<String> tUnit = (JComboBox<String>) tPanel.getComponent(2);
+
+		JTextField wValue = (JTextField) wPanel.getComponent(1);
+		JComboBox<String> wUnit = (JComboBox<String>) wPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double b = UnitConvertion.linearTomm(Double.parseDouble(bValue.getText()), bUnit.getSelectedItem().toString());
+		double t = UnitConvertion.linearTomm(Double.parseDouble(tValue.getText()), tUnit.getSelectedItem().toString());
+		double w = UnitConvertion.linearTomm(Double.parseDouble(wValue.getText()), wUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new ISection(d, b, t, w, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the Rectangle tab
+	 * 
+	 * @return JPanel for the Rectangle tab
+	 */
+	private JPanel createRectSection() {
+
+		JPanel RectSectionPanel = new JPanel();
+
+		RectSectionPanel.setLayout(new BoxLayout(RectSectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		RectSectionPanel.add(diameterPanal);
+
+		JPanel WidthPanal = DoubleTextBox("b:", true);
+		RectSectionPanel.add(WidthPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		RectSectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		RectSectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		RectSectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(
+				e -> RectSectionCreated(diameterPanal, WidthPanal, LengthPanal, EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		RectSectionPanel.add(CreatePanal);
+
+		return RectSectionPanel;
+	}
+
+	/**
+	 * When a Rect section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing width
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void RectSectionCreated(JPanel dPanel, JPanel bPanel, JPanel LPanel, JPanel KPanel, JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField bValue = (JTextField) bPanel.getComponent(1);
+		JComboBox<String> bUnit = (JComboBox<String>) bPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double b = UnitConvertion.linearTomm(Double.parseDouble(bValue.getText()), bUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new RectSection(d, b, material, L, k);
+
+	}
+
+	/**
+	 * The JPanel desplayed for the T-section tab
+	 * 
+	 * @return JPanel for the T-section tab
+	 */
+	private JPanel createTSection() {
+
+		JPanel ISectionPanel = new JPanel();
+
+		ISectionPanel.setLayout(new BoxLayout(ISectionPanel, BoxLayout.Y_AXIS));
+
+		JPanel diameterPanal = DoubleTextBox("d:", true);
+		ISectionPanel.add(diameterPanal);
+
+		JPanel WidthPanal = DoubleTextBox("b:", true);
+		ISectionPanel.add(WidthPanal);
+
+		JPanel ThicknessPanal = DoubleTextBox("t:", true);
+		ISectionPanel.add(ThicknessPanal);
+
+		JPanel wPanal = DoubleTextBox("W:", true);
+		ISectionPanel.add(wPanal);
+
+		JPanel LengthPanal = DoubleTextBox("L:", true);
+		ISectionPanel.add(LengthPanal);
+
+		JPanel EffectiveLengthPanal = DoubleTextBox("k:", false);
+		ISectionPanel.add(EffectiveLengthPanal);
+
+		JPanel MaterialPanal = materialDropDown();
+		ISectionPanel.add(MaterialPanal);
+
+		JPanel CreatePanal = new JPanel();
+		CreatePanal.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		JButton CreateButton = new JButton("Create");
+		CreateButton.addActionListener(e -> TSectionCreated(diameterPanal, WidthPanal, ThicknessPanal, wPanal,
+				LengthPanal, EffectiveLengthPanal, MaterialPanal));
+		CreatePanal.add(CreateButton);
+		ISectionPanel.add(CreatePanal);
+
+		return ISectionPanel;
+	}
+
+	/**
+	 * When a T section is created
+	 * 
+	 * @param dPanel JPanel storing diameter
+	 * @param dPanel JPanel storing width
+	 * @param dPanel JPanel storing thickness
+	 * @param dPanel JPanel storing w
+	 * @param LPanel JPanel storing length
+	 * @param KPanel JPanel storing effective length constant
+	 * @param MPanel JPanel storing Material info
+	 */
+	@SuppressWarnings("unchecked")
+	private void TSectionCreated(JPanel dPanel, JPanel bPanel, JPanel tPanel, JPanel wPanel, JPanel LPanel,
+			JPanel KPanel, JPanel MPanel) {
+
+		JTextField dValue = (JTextField) dPanel.getComponent(1);
+		JComboBox<String> dUnit = (JComboBox<String>) dPanel.getComponent(2);
+
+		JTextField bValue = (JTextField) bPanel.getComponent(1);
+		JComboBox<String> bUnit = (JComboBox<String>) bPanel.getComponent(2);
+
+		JTextField tValue = (JTextField) tPanel.getComponent(1);
+		JComboBox<String> tUnit = (JComboBox<String>) tPanel.getComponent(2);
+
+		JTextField wValue = (JTextField) wPanel.getComponent(1);
+		JComboBox<String> wUnit = (JComboBox<String>) wPanel.getComponent(2);
+
+		JTextField LValue = (JTextField) LPanel.getComponent(1);
+		JComboBox<String> LUnit = (JComboBox<String>) LPanel.getComponent(2);
+
+		JTextField KValue = (JTextField) KPanel.getComponent(1);
+
+		JComboBox<String> MValue = (JComboBox<String>) MPanel.getComponent(0);
+
+		double d = UnitConvertion.linearTomm(Double.parseDouble(dValue.getText()), dUnit.getSelectedItem().toString());
+		double b = UnitConvertion.linearTomm(Double.parseDouble(bValue.getText()), bUnit.getSelectedItem().toString());
+		double t = UnitConvertion.linearTomm(Double.parseDouble(tValue.getText()), tUnit.getSelectedItem().toString());
+		double w = UnitConvertion.linearTomm(Double.parseDouble(wValue.getText()), wUnit.getSelectedItem().toString());
+		double L = UnitConvertion.linearTomm(Double.parseDouble(LValue.getText()), LUnit.getSelectedItem().toString());
+		double k = Double.parseDouble(KValue.getText());
+
+		int material = materialDecoder(MValue);
+
+		dispose();
+		
+		new TSection(d, b, t, w, material, L, k);
 
 	}
 
