@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -15,13 +16,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 
-import drawing.Dimentions;
-import drawing.DrawLine;
-
 public class MainWindow extends JFrame {
 
 	public static JPanel DrawingPanel;
-	
+
 	/**
 	 * 
 	 */
@@ -50,9 +48,10 @@ public class MainWindow extends JFrame {
 
 		add(ToolBarTabs);
 
-		DrawingPanel = new JPanel();
+		DrawingPanel = new DrawingPanel();
 		DrawingPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 		add(DrawingPanel);
+		// SwingUtilities.invokeLater(DrawingPanel::new);
 
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -121,6 +120,11 @@ public class MainWindow extends JFrame {
 		JPanel memberToolBar = new JPanel();
 
 		memberToolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		String[] SelectList = { "OFF", "ALL", "JOINT", "MEMBER", "PANAL" };
+		JComboBox<String> SelectDropDown = new JComboBox<>(SelectList);
+		memberToolBar.add(SelectDropDown);
+		SelectDropDown.addActionListener(e -> Select.updateMode(SelectDropDown.getSelectedItem().toString()));
 
 		// Create new CrossSection
 		JPanel AddNewCrossSectionPanal = new JPanel();
@@ -129,22 +133,22 @@ public class MainWindow extends JFrame {
 		AddNewCrossSectionButton.addActionListener(e -> CreateNewMemberCrossSection());
 		AddNewCrossSectionPanal.add(AddNewCrossSectionButton);
 		memberToolBar.add(AddNewCrossSectionPanal);
-		
+
 		// Draw Member
 		JPanel DrawMember = new JPanel();
 		DrawMember.setLayout(new BoxLayout(DrawMember, BoxLayout.Y_AXIS));
 		JButton Line = new JButton("Line");
-		Line.addActionListener(e -> DrawLine.drawLine());
+		// Line.addActionListener(e -> DrawLine.drawLine());
 		DrawMember.add(Line);
 		memberToolBar.add(DrawMember);
-		
+
 		// Dimention Member
-				JPanel DimentionMember = new JPanel();
-				DimentionMember.setLayout(new BoxLayout(DimentionMember, BoxLayout.Y_AXIS));
-				JButton Dimention = new JButton("Dimention");
-				Dimention.addActionListener(e -> Dimentions.dimention());
-				DimentionMember.add(Dimention);
-				memberToolBar.add(DimentionMember);
+		JPanel DimentionMember = new JPanel();
+		DimentionMember.setLayout(new BoxLayout(DimentionMember, BoxLayout.Y_AXIS));
+		JButton Dimention = new JButton("Dimention");
+		// Dimention.addActionListener(e -> Dimentions.dimention());
+		DimentionMember.add(Dimention);
+		memberToolBar.add(DimentionMember);
 
 		memberToolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
@@ -155,9 +159,9 @@ public class MainWindow extends JFrame {
 		System.out.print("CreateNewMemeber");
 		new NewMember();
 	}
-	
+
 	/**
-	 * Repaints the drawing panel 
+	 * Repaints the drawing panel
 	 * 
 	 * @param newPanel what the panel is not to look like
 	 */

@@ -1,5 +1,8 @@
 package drawingObjects;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+
 /**
  * the object for all the joints on the ends of members and between members
  * 
@@ -17,6 +20,8 @@ public class Joint {
 	 * y cordanit
 	 */
 	public double y;
+	
+	public boolean selected = false;
 
 	/**
 	 * Constructor: Creates a joint
@@ -27,6 +32,11 @@ public class Joint {
 	public Joint(double x, double y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public void draw(Graphics2D g) {
+		g.setColor(selected ? Color.CYAN : Color.BLACK);
+		g.fillOval((int)x - 3, (int)y - 3, 6, 6);
 	}
 
 }
