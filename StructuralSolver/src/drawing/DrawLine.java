@@ -1,18 +1,10 @@
 package drawing;
 
-import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
 import UI.MainWindow;
-import drawingObjects.Scene;
 import drawingObjects.Joint;
 import drawingObjects.Line;
-import main.MAIN;
+import drawingObjects.Scene;
 
 /**
  * draws a line between the two points cliked
@@ -22,68 +14,74 @@ import main.MAIN;
  * @version 1.0 May 20, 2025
  * 
  */
-public class DrawLine {
+public class DrawLine implements Runnable {
+	@Override
+	public void run() {
 
-//	/**
-//	 * The two end points
-//	 */
-//	static Joint click1, click2;
-//
-//	/**
-//	 * How many clicks have been made
-//	 */
-//	static int clickNum = 0;
-//
-//	/**
-//	 * The main function for drawing a line
-//	 */
-//	public void drawLine() {
-//
-//		JPanel DrawingArea = MainWindow.DrawingPanel;
-//
-//		Point curser = MouseInfo.getPointerInfo().getLocation();
-//		SwingUtilities.convertPointFromScreen(curser, DrawingArea);
-//
-//		RightClickListener rClick = new RightClickListener();
-//
-//		DrawingArea.addMouseListener(rClick);
-//
-//	}
-//
-//	/**
-//	 * When there has been a click get its location and determin if a line can now
-//	 * be drawn or not
-//	 * 
-//	 * @param e
-//	 */
-//	public void click(MouseEvent e) {
-//
-//		Point click = MouseInfo.getPointerInfo().getLocation();
-//
-//		if (SwingUtilities.isLeftMouseButton(e) && MainWindow.DrawingPanel.getBounds().contains(click)) {
-//
-//			SwingUtilities.convertPointFromScreen(click, MainWindow.DrawingPanel);
-//
-//			clickNum++;
-//
-//			if (clickNum == 1) {
-//				click1 = new Joint(click.x, click.y);
-//
-//			}
-//
-//			if (clickNum == 2) {
-//				clickNum = 0;
-//				click2 = new Joint(click.x, click.y);
-//
-//				click2 = Snaping.snapToAngle(click1, click2);
-//
-//				Scene.lines.add(new Line(click1, click2));
-//
-//			}
-//
-//		}
-//
-//	}
+		while (drawing) {
+
+			Point a = MainWindow.DrawingPanel.getMousePosition();
+			if (a != null) {
+				int x = (int) a.getX();
+				int y = (int) a.getY();
+				mouse = new Joint(x, y);
+				MainWindow.DrawingPanel.repaint();
+			}
+			try {
+				Thread.currentThread();
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static Joint click1, click2;
+	public static Joint mouse;
+	public static int clickNum = 0;
+	static boolean drawing = false;
+	static Thread threaddrawLine;
+
+	public static void drawLine() {
+		drawing = true;
+		DrawLine drawLine = new DrawLine();
+		Thread threaddrawLine = new Thread(drawLine);
+
+		threaddrawLine.start();
+
+	}
+
+	public static void end() {
+		click1 = null;
+		click2 = null;
+		clickNum = 0;
+		drawing = false;
+
+	}
+
+	public static void LineFinish(int x1, int y1, int x2, int y2) {
+		Joint start = new Joint(x1, y1);
+		Joint end = new Joint(x2, y2);
+
+		Line newLine = new Line(start, end);
+
+		Scene.lines.add(newLine);
+
+	}
+
+	public static void point(Joint p) {
+		if (clickNum == 0) {
+			click1 = p;
+			clickNum++;
+		} else if (clickNum == 1) {
+			click2 = p;
+			Line newLine = new Line(click1, click2);
+			Scene.lines.add(newLine);
+			MainWindow.DrawingPanel.repaint();
+			clickNum = 0;
+		}
+
+	}
 
 }
-

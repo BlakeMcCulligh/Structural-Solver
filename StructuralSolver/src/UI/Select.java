@@ -16,7 +16,7 @@ enum SelectMode {
 
 public class Select {
 	Scene scene;
-	static SelectMode mode = SelectMode.ALL;
+	public static SelectMode mode = SelectMode.ALL;
 	static int maxSelection = Integer.MAX_VALUE;
 	boolean additive = false;
 
@@ -56,6 +56,7 @@ public class Select {
 		selectedItems.clear();
 	}
 
+	@SuppressWarnings("static-access")
 	void toggleSelection(int x, int y) {
 		if (!additive)
 			clearSelection();
@@ -137,6 +138,7 @@ public class Select {
 		return Math.sqrt(dx * dx + dy * dy) <= 5;
 	}
 
+	@SuppressWarnings("static-access")
 	void dragSelect(Rectangle box, boolean strict) {
 		if (!additive)
 			clearSelection();
@@ -163,16 +165,16 @@ public class Select {
 		}
 	}
 
-	public static void updateMode(String Text) {
-		if (Text.equals("OFF")) {
+	public static void updateMode(int MODE) {
+		if (MODE == 0) {
 			setMode(SelectMode.OFF, Integer.MAX_VALUE);
-		} else if (Text.equals("ALL")) {
+		} else if (MODE == 1) {
 			setMode(SelectMode.ALL, Integer.MAX_VALUE);
-		} else if (Text.equals("JOINT")) {
+		} else if (MODE == 2) {
 			setMode(SelectMode.POINT, Integer.MAX_VALUE);
-		} else if (Text.equals("MEMBER")) {
+		} else if (MODE == 3) {
 			setMode(SelectMode.LINE, Integer.MAX_VALUE);
-		} else if (Text.equals("PANAL")) {
+		} else if (MODE == 4) {
 			setMode(SelectMode.POLYGON, Integer.MAX_VALUE);
 		}
 	}

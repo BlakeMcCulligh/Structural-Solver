@@ -16,6 +16,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import drawing.DrawLine;
+import drawing.SwitchTool;
 import drawingObjects.Joint;
 import drawingObjects.Line;
 import drawingObjects.Panal;
@@ -66,6 +68,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	}
 
 	@Override
+	@SuppressWarnings("static-access")
 	protected void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
@@ -87,7 +90,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 			poly.draw(g2);
 		}
 
-		if (dragStart != null && dragEnd != null) {
+		if (dragStart != null && dragEnd != null && Select.mode != SelectMode.OFF) {
 			g2.setColor(Color.BLUE);
 			int x = Math.min(dragStart.x, dragEnd.x);
 			int y = Math.min(dragStart.y, dragEnd.y);
@@ -96,13 +99,27 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 			g2.drawRect(x, y, w, h);
 		}
 
+		if (dragStart != null && dragEnd != null && SwitchTool.activeButton[1]) {
+			g2.setColor(Color.BLACK);
+			g2.drawLine(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
+		} else if (SwitchTool.activeButton[1] && DrawLine.clickNum == 1) {
+			g2.setColor(Color.BLACK);
+			g2.drawLine((int) DrawLine.click1.x, (int) DrawLine.click1.y, (int) DrawLine.mouse.x,
+					(int) DrawLine.mouse.y);
+		}
+
 		g2.setTransform(original);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		selector.additive = e.isShiftDown();
 		Point p = transformPoint(e.getPoint());
+
+		if (SwitchTool.activeButton[1]) {
+			DrawLine.point(new Joint(p.x, p.y));
+		}
+
+		selector.additive = e.isShiftDown();
 		selector.toggleSelection(p.x, p.y);
 		repaint();
 	}
@@ -121,12 +138,20 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 	public void mouseReleased(MouseEvent e) {
 		if (SwingUtilities.isMiddleMouseButton(e)) {
 			panStart = null;
-		} else if (dragStart != null) {
+		} else if (dragStart != null && Select.mode != SelectMode.OFF) {
 			dragEnd = transformPoint(e.getPoint());
 			Rectangle box = new Rectangle(Math.min(dragStart.x, dragEnd.x), Math.min(dragStart.y, dragEnd.y),
 					Math.abs(dragEnd.x - dragStart.x), Math.abs(dragEnd.y - dragStart.y));
 			boolean strict = dragEnd.x < dragStart.x;
 			selector.dragSelect(box, strict);
+			dragStart = dragEnd = null;
+			repaint();
+		} else if (dragStart != null && SwitchTool.activeButton[1]) {
+			dragEnd = transformPoint(e.getPoint());
+			Double length = Math.sqrt(Math.pow(dragEnd.x - dragStart.x, 2) + Math.pow(dragEnd.y - dragStart.y, 2));
+			if (length > 5) {
+				DrawLine.LineFinish(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
+			}
 			dragStart = dragEnd = null;
 			repaint();
 		}
@@ -142,6 +167,7 @@ public class DrawingPanel extends JPanel implements MouseListener, MouseMotionLi
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
+
 		if (SwingUtilities.isMiddleMouseButton(e)) {
 			Point current = e.getPoint();
 			offsetX += current.x - panStart.x;

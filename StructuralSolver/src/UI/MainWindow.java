@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -15,6 +17,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+
+import drawing.SwitchTool;
 
 public class MainWindow extends JFrame {
 
@@ -24,6 +29,9 @@ public class MainWindow extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 6252203059439893565L;
+
+	public static JToggleButton memberToolBarButtons[] = new JToggleButton[2];
+	public static JComboBox<String> SelectDropDown;
 
 	/**
 	 * Creates the window to add a new member
@@ -120,35 +128,53 @@ public class MainWindow extends JFrame {
 		JPanel memberToolBar = new JPanel();
 
 		memberToolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
-		
+
 		String[] SelectList = { "OFF", "ALL", "JOINT", "MEMBER", "PANAL" };
-		JComboBox<String> SelectDropDown = new JComboBox<>(SelectList);
+		SelectDropDown = new JComboBox<>(SelectList);
 		memberToolBar.add(SelectDropDown);
-		SelectDropDown.addActionListener(e -> Select.updateMode(SelectDropDown.getSelectedItem().toString()));
+
+		SelectDropDown.addActionListener(e -> {
+			String MODE = SelectDropDown.getSelectedItem().toString();
+			if (MODE.equals("OFF")) {
+
+			} else if (MODE.equals("ALL")) {
+				SwitchTool.switchTool(0, 1);
+			} else if (MODE.equals("JOINT")) {
+				SwitchTool.switchTool(0, 2);
+			} else if (MODE.equals("MEMBER")) {
+				SwitchTool.switchTool(0, 3);
+			} else if (MODE.equals("PANAL")) {
+				SwitchTool.switchTool(0, 4);
+			}
+
+		});
 
 		// Create new CrossSection
-		JPanel AddNewCrossSectionPanal = new JPanel();
-		AddNewCrossSectionPanal.setLayout(new BoxLayout(AddNewCrossSectionPanal, BoxLayout.Y_AXIS));
-		JButton AddNewCrossSectionButton = new JButton("New Cross-Section");
-		AddNewCrossSectionButton.addActionListener(e -> CreateNewMemberCrossSection());
-		AddNewCrossSectionPanal.add(AddNewCrossSectionButton);
-		memberToolBar.add(AddNewCrossSectionPanal);
+//		JPanel AddNewCrossSectionPanal = new JPanel();
+//		AddNewCrossSectionPanal.setLayout(new BoxLayout(AddNewCrossSectionPanal, BoxLayout.Y_AXIS));
+//		JButton AddNewCrossSectionButton = new JButton("New Cross-Section");
+//		AddNewCrossSectionButton.addActionListener(e -> CreateNewMemberCrossSection());
+//		AddNewCrossSectionPanal.add(AddNewCrossSectionButton);
+//		memberToolBar.add(AddNewCrossSectionPanal);
 
 		// Draw Member
 		JPanel DrawMember = new JPanel();
 		DrawMember.setLayout(new BoxLayout(DrawMember, BoxLayout.Y_AXIS));
-		JButton Line = new JButton("Line");
-		// Line.addActionListener(e -> DrawLine.drawLine());
-		DrawMember.add(Line);
+		memberToolBarButtons[1] = new JToggleButton("Line");
+		memberToolBarButtons[1].addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent ev) {
+				if (ev.getStateChange() == ItemEvent.SELECTED) {
+					System.out.println("CLICK");
+					SwitchTool.switchTool(1, 0);
+				} else if (ev.getStateChange() == ItemEvent.DESELECTED) {
+					System.out.println("UNCLICK");
+					SwitchTool.switchTool(0, 1);
+				}
+			}
+		});
+		
+		DrawMember.add(memberToolBarButtons[1]);
 		memberToolBar.add(DrawMember);
-
-		// Dimention Member
-		JPanel DimentionMember = new JPanel();
-		DimentionMember.setLayout(new BoxLayout(DimentionMember, BoxLayout.Y_AXIS));
-		JButton Dimention = new JButton("Dimention");
-		// Dimention.addActionListener(e -> Dimentions.dimention());
-		DimentionMember.add(Dimention);
-		memberToolBar.add(DimentionMember);
 
 		memberToolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 

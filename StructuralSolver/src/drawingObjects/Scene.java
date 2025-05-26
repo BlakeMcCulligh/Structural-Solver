@@ -11,8 +11,8 @@ import java.util.ArrayList;
  */
 public class Scene {
 	
-	public ArrayList<Joint> points = new ArrayList<>();
-	public ArrayList<Line> lines = new ArrayList<>();
-	public ArrayList<Panal> polygons = new ArrayList<>();
+	public static ArrayList<Joint> points = new ArrayList<>();
+	public static ArrayList<Line> lines = new ArrayList<>();
+	public static ArrayList<Panal> polygons = new ArrayList<>();
 
 }
